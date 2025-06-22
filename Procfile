@@ -1,1 +1,1 @@
-web: gunicorn webhook.wsgi --log-file -
+web: gunicorn webhook_app_django.wsgi --log-file -

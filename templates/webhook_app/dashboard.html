@@ -1,0 +1,95 @@
+{% extends "webhook_app/base.html" %}
+
+{% block title %}Dashboard Webhook{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1><i class="bi bi-speedometer2"></i> Dashboard</h1>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Statut des transactions -->
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-body">
+                <h5 class="card-title">Transactions reçues</h5>
+                <p class="card-text display-4">{{ stats.received }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body">
+                <h5 class="card-title">Transactions traitées</h5>
+                <p class="card-text display-4">{{ stats.processed }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-warning h-100">
+            <div class="card-body">
+                <h5 class="card-title">En traitement</h5>
+                <p class="card-text display-4">{{ stats.processing }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-danger h-100">
+            <div class="card-body">
+                <h5 class="card-title">Échecs</h5>
+                <p class="card-text display-4">{{ stats.failed }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-graph-up"></i> Activité récente</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Statut</th>
+                                <th>Reçu le</th>
+                                <th>Traité le</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in recent_transactions %}
+                            <tr>
+                                <td>{{ transaction.transaction_id|truncatechars:15 }}</td>
+                                <td>
+                                    <span class="badge bg-{% if transaction.status == 'processed' %}success{% elif transaction.status == 'failed' %}danger{% else %}warning{% endif %}">
+                                        {{ transaction.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ transaction.received_at|date:"d/m/Y H:i" }}</td>
+                                <td>{{ transaction.processed_at|date:"d/m/Y H:i"|default:"-" }}</td>
+                                <td>
+                                    <a href="{% url 'transaction-detail' transaction.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Détails
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

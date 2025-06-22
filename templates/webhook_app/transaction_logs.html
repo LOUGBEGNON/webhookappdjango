@@ -1,0 +1,112 @@
+{% extends "webhook_app/base.html" %}
+
+{% block title %}Logs Transaction #{{ transaction.transaction_id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'transaction-list' %}">Transactions</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'transaction-detail' transaction.id %}">#{{ transaction.transaction_id }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Logs</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="bi bi-journal-text"></i> Logs de la transaction #{{ transaction.transaction_id }}
+            </h1>
+            <a href="{% url 'transaction-detail' transaction.id %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Retour aux détails
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5>Historique des événements</h5>
+                    <span class="badge bg-secondary">{{ logs|length }} entrées</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    {% for log in logs %}
+                    <div class="timeline-item {% if log.level == 'error' or log.level == 'critical' %}timeline-item-danger{% elif log.level == 'warning' %}timeline-item-warning{% endif %}">
+                        <div class="timeline-item-marker">
+                            <div class="timeline-item-marker-indicator bg-{% if log.level == 'error' or log.level == 'critical' %}danger{% elif log.level == 'warning' %}warning{% else %}primary{% endif %}"></div>
+                        </div>
+                        <div class="timeline-item-content">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold text-{% if log.level == 'error' or log.level == 'critical' %}danger{% elif log.level == 'warning' %}warning{% else %}primary{% endif %}">
+                                    {{ log.get_level_display|upper }}
+                                </span>
+                                <small class="text-muted">{{ log.timestamp|date:"d/m/Y H:i:s" }}</small>
+                            </div>
+                            <p>{{ log.message }}</p>
+                            {% if log.details %}
+                            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#logDetails{{ log.id }}">
+                                <i class="bi bi-chevron-down"></i> Détails
+                            </button>
+                            <div class="collapse mt-2" id="logDetails{{ log.id }}">
+                                <pre class="bg-light p-2"><code>{{ log.details_json }}</code></pre>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 1rem;
+        margin: 0 0 0 1rem;
+        border-left: 1px solid #dee2e6;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+    
+    .timeline-item-marker {
+        position: absolute;
+        left: -1.75rem;
+        top: 0;
+    }
+    
+    .timeline-item-marker-indicator {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 100%;
+        border: 3px solid #fff;
+    }
+    
+    .timeline-item-content {
+        padding-left: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Highlight JSON details
+    document.querySelectorAll('pre code').forEach((block) => {
+        try {
+            const json = JSON.parse(block.textContent);
+            block.textContent = JSON.stringify(json, null, 2);
+        } catch (e) {
+            // Not JSON, leave as is
+        }
+    });
+});
+</script>
+{% endblock %}

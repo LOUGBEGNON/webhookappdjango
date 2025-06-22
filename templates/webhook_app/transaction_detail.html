@@ -1,0 +1,95 @@
+{% extends "webhook_app/base.html" %}
+
+{% block title %}Détail Transaction #{{ transaction.transaction_id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'transaction-list' %}">Transactions</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Détail #{{ transaction.transaction_id }}</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="bi bi-receipt"></i> Transaction #{{ transaction.transaction_id }}
+                <span class="badge bg-{% if transaction.status == 'processed' %}success{% elif transaction.status == 'failed' %}danger{% else %}warning{% endif %}">
+                    {{ transaction.get_status_display }}
+                </span>
+            </h1>
+            <a href="{% url 'transaction-logs' transaction.id %}" class="btn btn-outline-info">
+                <i class="bi bi-journal-text"></i> Voir les logs
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Informations de base</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">ID Transaction</dt>
+                            <dd class="col-sm-8">{{ transaction.transaction_id }}</dd>
+
+                            <dt class="col-sm-4">Statut</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-{% if transaction.status == 'processed' %}success{% elif transaction.status == 'failed' %}danger{% else %}warning{% endif %}">
+                                    {{ transaction.get_status_display }}
+                                </span>
+                            </dd>
+
+                            <dt class="col-sm-4">Reçu le</dt>
+                            <dd class="col-sm-8">{{ transaction.received_at|date:"d/m/Y H:i:s" }}</dd>
+
+                            <dt class="col-sm-4">Traitement terminé</dt>
+                            <dd class="col-sm-8">
+                                {% if transaction.processed_at %}
+                                    {{ transaction.processed_at|date:"d/m/Y H:i:s" }}
+                                    ({{ transaction.processed_at|timesince:transaction.received_at }})
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </dd>
+
+                            {% if transaction.error_message %}
+                            <dt class="col-sm-4">Erreur</dt>
+                            <dd class="col-sm-8 text-danger">{{ transaction.error_message }}</dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>En-têtes HTTP</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre><code class="language-json">{{ headers_json }}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5>Contenu du webhook (Payload)</h5>
+            </div>
+            <div class="card-body">
+                <pre><code class="language-json">{{ payload_json }}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+{% endblock %}

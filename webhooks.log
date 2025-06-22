@@ -1,0 +1,114 @@
+2025-06-22 08:15:56,260 | DEBUG    | webhook_app | Message de test DEBUG
+2025-06-22 08:15:56,260 | ERROR    | webhook_app | Message de test ERROR
+2025-06-22 08:16:08,825 | DEBUG    | webhook_app | Message de test DEBUG
+2025-06-22 08:16:08,825 | ERROR    | webhook_app | Message de test ERROR
+2025-06-22 08:16:18,125 | DEBUG    | webhook_app | === TEST LOG MESSAGE ===
+2025-06-22 08:16:18,126 | DEBUG    | webhook_app | Request headers: {'Content-Length': '429', 'Content-Type': 'application/json', 'User-Agent': 'PostmanRuntime/7.44.1', 'Accept': '*/*', 'Postman-Token': '31d2c2c5-7be3-4b24-a1db-ee7b241759ac', 'Host': '127.0.0.1:8000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive'}
+2025-06-22 08:16:18,127 | DEBUG    | webhook_app | Raw body: {
+    "reference": "07e9752d-7108-44d5-9d92-e159f02ab032",
+    "status": "FAILED",
+    "amount": 100,
+    "callback_info": "{ id_demande: '{{4.Demande}}', caisse: '{{4.Caisse}}' }",
+    "last_name": "",
+    "first_name": "AMÉDÉE LOUGBEGNON",
+    "email": "amedeelougbegnon3@gmail.com",
+    "type": "Paiement",
+    "phoneNumber": 2290190877433,
+    "date": "2025-06-21T17:09:07.824Z",
+    "reseau": "MTN",
+    "ref_link": ""
+  }
+2025-06-22 08:16:18,773 | ERROR    | webhook_app | Critical processing error: [Errno 61] Connection refused
+Traceback (most recent call last):
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/utils/functional.py", line 32, in __call__
+    return self.__value__
+           ^^^^^^^^^^^^^^
+AttributeError: 'ChannelPromise' object has no attribute '__value__'. Did you mean: '__call__'?
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/connection.py", line 472, in _reraise_as_library_errors
+    yield
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/connection.py", line 459, in _ensure_connection
+    return retry_over_time(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/utils/functional.py", line 318, in retry_over_time
+    return fun(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/connection.py", line 938, in _connection_factory
+    self._connection = self._establish_connection()
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/connection.py", line 860, in _establish_connection
+    conn = self.transport.establish_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/transport/pyamqp.py", line 203, in establish_connection
+    conn.connect()
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/amqp/connection.py", line 324, in connect
+    self.transport.connect()
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/amqp/transport.py", line 132, in connect
+    self._connect(self.host, self.port, self.connect_timeout)
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/amqp/transport.py", line 187, in _connect
+    self.sock.connect(sa)
+ConnectionRefusedError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/apps/webhook_app/views.py", line 75, in webhook_receiver
+    process_transaction.delay(transaction.id)
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/celery/app/task.py", line 444, in delay
+    return self.apply_async(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/celery/app/task.py", line 601, in apply_async
+    return app.send_task(
+           ^^^^^^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/celery/app/base.py", line 930, in send_task
+    amqp.send_task_message(P, name, message, **options)
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/celery/app/amqp.py", line 523, in send_task_message
+    ret = producer.publish(
+          ^^^^^^^^^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/messaging.py", line 190, in publish
+    return _publish(
+           ^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/connection.py", line 556, in _ensured
+    return fun(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/messaging.py", line 200, in _publish
+    channel = self.channel
+              ^^^^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/messaging.py", line 224, in _get_channel
+    channel = self._channel = channel()
+                              ^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/utils/functional.py", line 34, in __call__
+    value = self.__value__ = self.__contract__()
+                             ^^^^^^^^^^^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/messaging.py", line 240, in <lambda>
+    channel = ChannelPromise(lambda: connection.default_channel)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/connection.py", line 957, in default_channel
+    self._ensure_connection(**conn_opts)
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/connection.py", line 458, in _ensure_connection
+    with ctx():
+         ^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.10_1/Frameworks/Python.framework/Versions/3.12/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/Users/lougbegnonamedee/Documents/workspace/webhook_app_django/env/lib/python3.12/site-packages/kombu/connection.py", line 476, in _reraise_as_library_errors
+    raise ConnectionError(str(exc)) from exc
+kombu.exceptions.OperationalError: [Errno 61] Connection refused
+2025-06-22 08:37:49,088 | DEBUG    | webhook_app | === TEST LOG MESSAGE ===
+2025-06-22 08:37:49,089 | DEBUG    | webhook_app | Request headers: {'Content-Length': '429', 'Content-Type': 'application/json', 'User-Agent': 'PostmanRuntime/7.44.1', 'Accept': '*/*', 'Postman-Token': '07d7d612-79ec-48bc-8965-196cf7561586', 'Host': '127.0.0.1:8000', 'Accept-Encoding': 'gzip, deflate, br', 'Connection': 'keep-alive'}
+2025-06-22 08:37:49,089 | DEBUG    | webhook_app | Raw body: {
+    "reference": "07e9752d-7108-44d5-9d92-e159f02ab032",
+    "status": "FAILED",
+    "amount": 100,
+    "callback_info": "{ id_demande: '{{4.Demande}}', caisse: '{{4.Caisse}}' }",
+    "last_name": "",
+    "first_name": "AMÉDÉE LOUGBEGNON",
+    "email": "amedeelougbegnon3@gmail.com",
+    "type": "Paiement",
+    "phoneNumber": 2290190877433,
+    "date": "2025-06-21T17:09:07.824Z",
+    "reseau": "MTN",
+    "ref_link": ""
+  }

@@ -1,0 +1,145 @@
+{% extends "webhook_app/base.html" %}
+
+{% block title %}Liste des Transactions{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1><i class="bi bi-list-ul"></i> Transactions Webhook</h1>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between">
+                    <h5>Filtres</h5>
+                    <a href="{% url 'transaction-list' %}" class="btn btn-sm btn-outline-secondary">Réinitialiser</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="status" class="form-label">Statut</label>
+                        <select id="status" name="status" class="form-select">
+                            <option value="">Tous</option>
+                            {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="date_from" class="form-label">Du</label>
+                        <input type="date" id="date_from" name="date_from" class="form-control" value="{{ request.GET.date_from }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="date_to" class="form-label">Au</label>
+                        <input type="date" id="date_to" name="date_to" class="form-control" value="{{ request.GET.date_to }}">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-funnel"></i> Filtrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5>Liste des transactions</h5>
+                    <span class="badge bg-secondary">{{ paginator.count }} résultats</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID Transaction</th>
+                                <th>Statut</th>
+                                <th>Reçu le</th>
+                                <th>Traité le</th>
+                                <th>Erreur</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr>
+                                <td>{{ transaction.transaction_id }}</td>
+                                <td>
+                                    <span class="badge bg-{% if transaction.status == 'processed' %}success{% elif transaction.status == 'failed' %}danger{% else %}warning{% endif %}">
+                                        {{ transaction.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ transaction.received_at|date:"d/m/Y H:i" }}</td>
+                                <td>{{ transaction.processed_at|date:"d/m/Y H:i"|default:"-" }}</td>
+                                <td>{{ transaction.error_message|truncatechars:30|default:"-" }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'transaction-detail' transaction.id %}" class="btn btn-outline-primary" title="Détails">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{% url 'transaction-logs' transaction.id %}" class="btn btn-outline-info" title="Logs">
+                                            <i class="bi bi-journal-text"></i>
+                                        </a>
+                                        {% if transaction.status == 'failed' %}
+                                        <a href="#" class="btn btn-outline-warning" title="Réessayer">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">Aucune transaction trouvée</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if is_paginated %}
+                <nav aria-label="Pagination">
+                    <ul class="pagination justify-content-center mt-4">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
